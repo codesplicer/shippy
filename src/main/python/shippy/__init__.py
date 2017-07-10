@@ -13,5 +13,29 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from logging import getLogger, Formatter, INFO, StreamHandler
+
 __author__ = "Vik Bhatti"
 __version__ = "${version}"
+
+
+LOGGING_FORMAT = "%(asctime)-15s: %(name)s: %(levelname)-8s : %(filename)s:%(lineno)s - %(funcName)20s() : %(message)s"
+
+
+def initialise_root_logger(log_level=INFO):
+    """
+    Returns a root logger with logs to stdout using the given log_level
+    """
+    formatter = Formatter(LOGGING_FORMAT)
+
+    console_handler = StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    root_logger = getLogger(__name__)
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(console_handler)
+    return root_logger
+
+
+# Setup the module-level logger
+LOGGER = initialise_root_logger(INFO)

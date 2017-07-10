@@ -47,11 +47,11 @@ def set_properties(project):
 
     # Set coverage properties
     project.set_property("coverage_break_build", True)
-    project.set_property("coverage_threshold_warn", 70)
+    project.set_property("coverage_threshold_warn", 70)  # Fail the build if coverage drops below 70%
 
     # Set linter properties
     project.set_property("flake8_break_build", True)
-    project.set_property("flake8_ignore", "E501")   # Ignore lines longer than 80 chars
+    project.set_property("flake8_ignore", "E501")  # Ignore lines longer than 80 chars
     project.set_property("flake8_verbose_output", True)
 
     project.get_property('filter_resources_glob').append('**/shippy/__init__.py')
