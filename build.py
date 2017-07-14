@@ -27,6 +27,7 @@ use_plugin("python.install_dependencies")
 use_plugin("python.flake8")
 use_plugin("python.coverage")
 use_plugin("filter_resources")
+use_plugin("python.distutils")
 
 name = "shippy"
 authors = [Author("Vik Bhatti", "github@vikbhatti.com")]
@@ -41,12 +42,14 @@ default_task = ["clean", "install_dependencies", "analyze", "publish"]
 @init
 def set_properties(project):
     project.build_depends_on("coverage")
-    # project.build_depends_on("")
+    project.depends_on_requirements("requirements.txt")
+    # project.build_depends_on_requirements("requirements-dev.txt")
 
     project.set_property("name", "shippy")
+    project.set_property("verbose", True)
 
     # Set coverage properties
-    project.set_property("coverage_break_build", True)
+    project.set_property("coverage_break_build", False)
     project.set_property("coverage_threshold_warn", 70)  # Fail the build if coverage drops below 70%
 
     # Set linter properties
