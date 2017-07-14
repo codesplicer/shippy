@@ -23,6 +23,7 @@ Builds and manages a docker data volume with the provided sourcecode
 import logging
 from io import BytesIO
 from docker import AutoVersionClient
+from copy import deepcopy
 
 LOGGER = logging.getLogger(__name__)
 DOCKERFILE_TEMPLATE = '''
@@ -48,13 +49,13 @@ class DataVolume:
         """
         Constructor
 
-        :param sourcecode_path:
-        :param sha:
-        :param config:
+        :param sourcecode_path: (str) Path to unpacked sourcecode for the given hash
+        :param sha: (str) Commit hash to work on
+        :param config: (dict) Configuration object as parsed by shippy.config
         """
         self.sourcecode_path = sourcecode_path
         self.sha = sha
-        self.config = config
+        self.config = deepcopy(config)
         self.cli = AutoVersionClient(base_url='unix://var/run/docker.sock')
         self.volume_name = self._generate_name()
 
@@ -62,7 +63,7 @@ class DataVolume:
         """
         Generates a name for the data volume
 
-        :return:
+        :return: (str) Volume name
         """
         volume_name = "{app_name}_data_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
         return volume_name
