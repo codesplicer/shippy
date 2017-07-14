@@ -57,4 +57,5 @@ def set_properties(project):
     project.set_property("flake8_ignore", "E501")  # Ignore lines longer than 80 chars
     project.set_property("flake8_verbose_output", True)
 
+    # Set project version in module file
     project.get_property('filter_resources_glob').append('**/shippy/__init__.py')
