@@ -21,5 +21,9 @@ pip-log.txt
 .coverage
 .tox
 
+# Sublime project
+*.sublime-project
+*.sublime-workspace
+
 # Virtualenvs
 ve*
