@@ -20,3 +20,39 @@ shippy.data_volume
 Builds and manages a docker data volume with the provided sourcecode
 
 """
+import logging
+from io import BytesIO
+from docker import AutoVersionClient
+
+LOGGER = logging.getLogger(__name__)
+DOCKERFILE_TEMPLATE = '''
+FROM busybox
+
+MAINTAINER Vik Bhatti <github@vikbhatti.com>
+
+# Create source directory
+RUN mkdir -p {{ target_sourcepath }}
+RUN chmod -R 777 {{ target_sourcepath }}
+
+ADD {{ source_archivedir }} {{ target_sourcepath }}
+
+VOLUME {{ target_sourcepath }}
+
+'''
+
+
+class DataVolume:
+
+    def __init__(self, sourcecode_path, sha, config):
+        """
+        Constructor
+
+        :param sourcecode_path:
+        :param sha:
+        :param config:
+        """
+        self.sourcecode_path = sourcecode_path
+        self.sha = sha
+        self.config = config
+        self.cli = AutoVersionClient(base_url='unix://var/run/docker.sock')
+
