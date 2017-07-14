@@ -28,8 +28,6 @@ LOGGER = logging.getLogger(__name__)
 DOCKERFILE_TEMPLATE = '''
 FROM busybox
 
-MAINTAINER Vik Bhatti <github@vikbhatti.com>
-
 # Create source directory
 RUN mkdir -p {{ target_sourcepath }}
 RUN chmod -R 777 {{ target_sourcepath }}
@@ -37,6 +35,9 @@ RUN chmod -R 777 {{ target_sourcepath }}
 ADD {{ source_archivedir }} {{ target_sourcepath }}
 
 VOLUME {{ target_sourcepath }}
+
+LABEL version={{ source_sha }}
+LABEL maintainer="Vik Bhatti (github@vikbhatti.com)"
 
 '''
 
@@ -55,4 +56,40 @@ class DataVolume:
         self.sha = sha
         self.config = config
         self.cli = AutoVersionClient(base_url='unix://var/run/docker.sock')
+        self.volume_name = self._generate_name()
 
+    def _generate_name(self):
+        """
+        Generates a name for the data volume
+
+        :return:
+        """
+        volume_name = "{app_name}_data_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
+        return volume_name
+
+    def build(self):
+        """
+        Builds a docker data volume
+
+        """
+        '''
+        1. copy sourcecode path into volume
+        2. create named docker volume.
+            In order to facilitate lookup for cleanup, we need to
+            be able to search based on standard naming convention (or image label)
+        '''
+        f = BytesIO(DOCKERFILE_TEMPLATE.encode("utf-8"))
+
+        LOGGER.info("Creating docker data volume")
+        response = [line for line in self.cli.build(fileobj=f, rm=True, tag=self.volume_name)]
+        LOGGER.info(response)
+
+    def remove(self):
+        """
+        Deletes an image
+
+        :return:
+        """
+        LOGGER.info("Removing image: %s", self.volume_name)
+        response = [line for line in self.cli.remove(image=self.volume_name, force=True)]
+        LOGGER.info(response)
