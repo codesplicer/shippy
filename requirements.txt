@@ -1,0 +1,6 @@
+docker-py
+requests
+tqdm
+argh
+validictory
+jinja2
