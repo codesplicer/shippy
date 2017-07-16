@@ -24,6 +24,7 @@ import requests
 import logging
 
 from tqdm import tqdm
+from utils import get_repository_username, get_repository_appname
 
 
 GITHUB_API_BASEURL = "https://api.github.com"
@@ -34,14 +35,45 @@ class RepositoryArchive:
 
     def __init__(self, url):
         self.url = url
-        self.username = self._get_username()
-        self.repo_name = self._get_reponame()
+        self.username = get_repository_username(url)
+        self.repo_name = get_repository_appname(url)
 
-    def _get_username(self):
+    def get_archive_url(self, sha, format="tarball"):
         """
-        Returns the repository username
+        Generates download URL for the given hash and format
 
-        :return: (str) Repository owner username
+        :param sha: (str) Commit hash to download
+        :param format: Archive format [tarball, zipball]. Default: tarball
+        :return: (str) Archive download URL
         """
-        position = self.url.find("github.com")
-        if position >= 0:
+        supported_formats = ["tarball", "zipball"]
+        if format not in supported_formats:
+            raise ValueError("The supplied format must be one of 'tarball' or 'zipball'")
+
+        url_pattern = "{api_base}/repos/{user}/{reponame}/{format}/{ref}"
+        archive_url = url_pattern.format(api_base=GITHUB_API_BASEURL, user=self.username, reponame=self.repo_name, format=format, ref=sha)
+        return archive_url
+
+    def fetch(self, sha, download_path="/tmp"):
+        """
+        Downloads the archive for the given commit hash
+
+        :param sha: (str) Commit hash to download
+        :param download_path: (str) Filesystem path to download archive to. Default: /tmp
+        :return: (str) Full path to the downloaded archive
+        """
+        filename = "{0}.tar.gz".format(self.repo_name)
+        local_filename = os.path.join(download_path, filename)
+        download_url = self.get_archive_url(sha)
+
+        LOGGER.info("Downloading to: %s", local_filename)
+        r = requests.get(download_url, stream=True)
+
+        # Get the total size in bytes
+        total_size = int(r.headers.get("content-length", 0))
+
+        with open(local_filename, 'wb') as f:
+            for chunk in tqdm(r.iter_content(32 * 1024), total=total_size, unit="B", unit_scale=True):
+                if chunk:
+                    f.write(chunk)
+        return local_filename
