@@ -73,6 +73,38 @@ class DataVolume:
         :return:(str) Name of the docker volume tag
         """
         return self.volume_name
+
+    def _render_template(self):
+        """
+        Renders dockerfile template
+
+        :return: (str) Rendered template
+        """
+        data = {
+            "mountpoint": self.config["application_source_mountpoint"],
+            "source_archivedir": self.sourcecode_path,
+            "source_sha": self.sha
+        }
+
+        template = DOCKERFILE_TEMPLATE.format(**data)
+        return template
+
+    def _write_dockerfile(self):
+        """
+        Writes a dockerfile into the source path
+
+        :return: None
+        """
+        template = self._render_template()
+        dockerfile_path = "{sourcepath}/Dockerfile".format(sourcepath=self.sourcecode_path)
+        LOGGER.info("Writing dockerfile to: %s", dockerfile_path)
+        with open(dockerfile_path, "w") as f:
+            try:
+                f.write(template)
+            except OSError as e:
+                LOGGER.error("Could not write dockerfile")
+                LOGGER.error(e)
+                raise SystemExit(1)
     def build(self):
         """
         Builds a docker data volume
