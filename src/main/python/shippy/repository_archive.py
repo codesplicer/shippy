@@ -32,4 +32,16 @@ LOGGER = logging.getLogger(__name__)
 
 class RepositoryArchive:
 
+    def __init__(self, url):
+        self.url = url
+        self.username = self._get_username()
+        self.repo_name = self._get_reponame()
 
+    def _get_username(self):
+        """
+        Returns the repository username
+
+        :return: (str) Repository owner username
+        """
+        position = self.url.find("github.com")
+        if position >= 0:
