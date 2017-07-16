@@ -19,13 +19,10 @@ shippy.container_stack
 
 Builds docker-compose configurations for the stacks, and handles setup and teardown of container resources
 """
-# import json
 import logging
-# import os
 from shippy import utils
 from copy import deepcopy
 
-# from shippy.utils import get_template_filepath
 from shippy.utils import load_template, get_repository_appname, run_command
 
 LOGGER = logging.getLogger(__name__)
@@ -37,7 +34,6 @@ class ContainerStack:
         self.config = deepcopy(config)
         self.sha = sha
         self.working_dir = working_dir
-        # self.volume_name = volume_name
         self.volume_tag = volume_tag
         self.compose_filepath = None
 
@@ -112,10 +108,7 @@ class ContainerStack:
         :return:
         """
         context = "{app_name}_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
-        # cmd = "/usr/local/bin/docker-compose -p {context} --project-directory {project_dir} up -d".format(context=context, project_dir=self.working_dir)
-        # cmd = "/usr/local/bin/docker-compose -p {context} -f {compose_file} up -d".format(context=context, compose_file=self.compose_filepath)
         cmd = "/usr/local/bin/docker-compose -p {context} up -d".format(context=context)
-        # execute_command(cmd, working_dir=self.working_dir)
         utils.execute_command(cmd, working_dir=self.working_dir)
 
     def stop(self):
