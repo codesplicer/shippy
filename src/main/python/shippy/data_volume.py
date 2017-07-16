@@ -66,6 +66,13 @@ class DataVolume:
         volume_name = "{app_name}_data_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
         return volume_name
 
+    def get_name(self):
+        """
+        Returns name of the docker volume
+
+        :return:(str) Name of the docker volume tag
+        """
+        return self.volume_name
     def build(self):
         """
         Builds a docker data volume
