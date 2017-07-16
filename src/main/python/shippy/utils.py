@@ -185,3 +185,76 @@ def copy_file(source_file, dest_dir):
     LOGGER.info("Copying file: %s to destination: %s", source_file, dest_dir)
     shutil.copy2(source_file, dest_dir)
 
+
+def run_command(cmd, dir=None):
+    """
+    Runs the given command inside the specified directory, async streams stdout
+
+    :param cmd: (str) Command to execute
+    :param dir: (str) path to run the command inside
+    :return:
+    """
+    if dir:
+        command = "cd {dir} && {cmd}".format(dir=dir, cmd=cmd)
+    else:
+        command = cmd
+
+    print(execute(
+        [command],
+        lambda x: LOGGER.info("STDOUT: %s" % x),
+        lambda x: LOGGER.error("STDERR: %s" % x),
+    ))
+
+
+async def _read_stream(stream, cb):
+    """
+    Stream/pipe to process, executing the given callback function on each line
+
+    :param stream:
+    :param cb:
+    :return:
+    """
+    while True:
+        line = await stream.readline()
+        if line:
+            cb(line)
+        else:
+            break
+
+
+async def _stream_subprocess(cmd, stdout_cb, stderr_cb):
+    """
+
+    :param cmd:
+    :param stdout_cb:
+    :param stderr_cb:
+    :return:
+    """
+    process = await asyncio.create_subprocess_exec(*cmd,
+                                                   stdout=asyncio.subprocess.PIPE,
+                                                   stderr=asyncio.subprocess.PIPE)
+
+    await asyncio.wait([
+        _read_stream(process.stdout, stdout_cb),
+        _read_stream(process.stderr, stderr_cb)
+    ])
+    return await process.wait()
+
+
+def execute(cmd, stdout_cb, stderr_cb):
+    """
+
+    :param cmd:
+    :param stdout_cb:
+    :param stderr_cb:
+    :return:
+    """
+    loop = asyncio.get_event_loop()
+    rc = loop.run_until_complete(
+        _stream_subprocess(
+            cmd,
+            stdout_cb,
+            stderr_cb,
+        ))
+    loop.close()
+    return rc
