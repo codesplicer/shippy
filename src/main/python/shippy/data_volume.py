@@ -105,10 +105,12 @@ class DataVolume:
                 LOGGER.error("Could not write dockerfile")
                 LOGGER.error(e)
                 raise SystemExit(1)
+
     def build(self):
         """
         Builds a docker data volume
 
+        :return: None
         """
         '''
         1. copy sourcecode path into volume
@@ -116,17 +118,25 @@ class DataVolume:
             In order to facilitate lookup for cleanup, we need to
             be able to search based on standard naming convention (or image label)
         '''
-        f = BytesIO(DOCKERFILE_TEMPLATE.encode("utf-8"))
-
+        # Write dockerfile
+        self._write_dockerfile()
         LOGGER.info("Creating docker data volume")
-        response = [line for line in self.cli.build(fileobj=f, rm=True, tag=self.volume_name)]
-        LOGGER.info(response)
+
+        try:
+            response = self.cli.build(path=self.sourcecode_path, rm=True, tag=self.volume_name)
+        except docker.errors.BuildError as e:
+            LOGGER.error("Problem building docker image")
+            LOGGER.error(e)
+            raise SystemExit(1)
+
+        for line in response:
+            LOGGER.info(line)
 
     def remove(self):
         """
-        Deletes an image
+        Deletes the docker image
 
-        :return:
+        :return: None
         """
         LOGGER.info("Removing image: %s", self.volume_name)
         response = [line for line in self.cli.remove(image=self.volume_name, force=True)]
