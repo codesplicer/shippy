@@ -1,0 +1,16 @@
+FROM busybox
+
+MAINTAINER Vik Bhatti <vik@vikbhatti.com>
+
+# Create default ghost content dirs
+RUN mkdir -p /usr/src/ghost
+RUN chmod -R 777 /usr/src/ghost
+
+ADD . /usr/src/ghost
+
+# Add our custom ghost config
+# ADD config.js /var/lib/ghost/config.js
+
+VOLUME /var/lib/mysql
+VOLUME /var/lib/ghost
+

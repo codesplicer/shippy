@@ -21,8 +21,8 @@ Builds and manages a docker data volume with the provided sourcecode
 
 """
 import logging
-from io import BytesIO
 import docker
+from docker import APIClient
 from copy import deepcopy
 
 LOGGER = logging.getLogger(__name__)
