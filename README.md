@@ -26,7 +26,7 @@ A tool to build and provision a docker-compose stack for a webapp given an appli
 
 # Supported Platforms
 
-This project was build using python3.6 and Docker for mac version 17.06.0-ce, on macOS Sierra.
+This project was built using python3.6 and Docker for mac version 17.06.0-ce, on macOS Sierra.
 It should work on any unix-like platform that docker supports but has not been tested on any other
 platforms yet. *NOT* supported on Windows.
 
@@ -96,7 +96,7 @@ To deploy a new application stack, you will need:
 * Application config file
 * Commit hash
 
-There is an example in the [examples](examples/ghost) folder for the [ghost blogging platform](https://github.com/TryGhost/Ghost).
+There is an example in the [examples/ghost](examples/ghost) folder for the [ghost blogging platform](https://github.com/TryGhost/Ghost).
 
 ## Build Configuration
 
