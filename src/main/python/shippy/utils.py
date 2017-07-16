@@ -109,6 +109,33 @@ def get_repository_appname(repo_url):
     repo_path = _get_repo_path(repo_url)
     return repo_path[1]
 
+def unpack_archive(archive_path, app_name, working_dir=None):
+    """
+    Unpacks the github tarball at the specified path.
+
+    The tarball has a top-level directory named after the project and hash, so when unpacking this
+    gets removed
+
+    :param archive_path:
+    :param app_name:
+    :param working_dir:
+    :return:
+    """
+    # /tmp/ghost-sha
+    LOGGER.info("About to unpack archive: %s", archive_path)
+    cmd = "mkdir -p {working_dir}/{app_name} && tar xvfz {archive_path} -C {working_dir}/{app_name} --strip-components 1".format(app_name=app_name, archive_path=archive_path, working_dir=working_dir)
+
+    LOGGER.info("Running command: %s", cmd)
+    try:
+        check_call(cmd, shell=True)
+    except CalledProcessError as e:
+        LOGGER.error(e)
+        raise SystemExit(1)
+
+    output_dir = "{working_dir}/{app_name}".format(working_dir=working_dir, app_name=app_name)
+    return output_dir
+
+
 def create_directory(dir):
     """
     Creates the specified directory if it doesn't exist, including all
