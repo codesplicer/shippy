@@ -109,6 +109,27 @@ def get_repository_appname(repo_url):
     repo_path = _get_repo_path(repo_url)
     return repo_path[1]
 
+
+def execute_command(cmd, working_dir=None):
+    """
+    Executes command in the working directory if specified
+    :param cmd:
+    :param working_dir:
+    :return:
+    """
+    if working_dir:
+        command = "cd {dir} && {cmd}".format(dir=working_dir, cmd=cmd)
+    else:
+        command = cmd
+
+    LOGGER.info("Executing command: %s", command)
+    try:
+        check_call(command, shell=True)
+    except CalledProcessError as e:
+        LOGGER.error(e)
+        raise SystemExit(1)
+
+
 def unpack_archive(archive_path, app_name, working_dir=None):
     """
     Unpacks the github tarball at the specified path.
@@ -151,4 +172,16 @@ def create_directory(dir):
         if e.errno != errno.EEXIST:
             # We have some other disk error
             raise
+
+
+def copy_file(source_file, dest_dir):
+    """
+    Copies the specified file into the destination directory
+
+    :param source_file: (str) Path to file to copy
+    :param dest_dir: (str) Path to destination directory
+    :return:
+    """
+    LOGGER.info("Copying file: %s to destination: %s", source_file, dest_dir)
+    shutil.copy2(source_file, dest_dir)
 
