@@ -59,3 +59,6 @@ def set_properties(project):
 
     # Set project version in module file
     project.get_property('filter_resources_glob').append('**/shippy/__init__.py')
+
+    # Install template files
+    project.include_file("shippy", "templates/*.j2")
