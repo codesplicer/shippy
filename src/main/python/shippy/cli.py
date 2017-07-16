@@ -22,6 +22,7 @@ Command-line entrypoint
 import logging
 import argh
 from shippy.data_volume import DataVolume
+from shippy.config_loader import ConfigLoader
 LOGGER = logging.getLogger(__name__)
 
 
@@ -41,4 +42,13 @@ def deploy_stack(**kwargs):
         # raise KeyError("Missing --configpath")
         LOGGER.error("Missing --configpath")
     configpath = kwargs["configpath"]
+
+    # 1. load and parse build configuration file
+    LOGGER.info("Loading config...")
+    config_loader = ConfigLoader(config_filepath=configpath, sha=sha)
+    config = config_loader.get()
+
+    # Create work directory
+    workdir = "/tmp/shippy/archives/{app_name}_{sha}".format(app_name=config["app_name"], sha=sha)
+    utils.create_directory(workdir)
 
