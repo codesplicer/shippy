@@ -29,15 +29,21 @@ LOGGER = logging.getLogger(__name__)
 DOCKERFILE_TEMPLATE = """\
 FROM busybox
 
-# Create source directory
-RUN groupadd -r user && useradd -r -g user user
-RUN mkdir -p {mountpoint} && chown -R user:user {mountpoint}
+# Add our user and group
+RUN addgroup -S user && adduser -G user -D user
+RUN mkdir -p {mountpoint}
+RUN chown -R user:user {mountpoint}
 RUN chmod -R 777 {mountpoint}
+
 ADD . {mountpoint}
+
 VOLUME {mountpoint}
+USER user
+
 LABEL version={source_sha}
 LABEL maintainer="Vik Bhatti (github@vikbhatti.com)"
 
+CMD ["echo", "Data container for app"]
 """
 
 
@@ -56,6 +62,7 @@ class DataVolume:
         self.config = deepcopy(config)
         self.cli = APIClient(base_url='unix://var/run/docker.sock')
         self.volume_name = self._generate_name()
+        self.volume_image_tag = self._generate_tag()
 
     def _generate_name(self):
         """
@@ -66,13 +73,30 @@ class DataVolume:
         volume_name = "{app_name}_data_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
         return volume_name
 
+    def _generate_tag(self):
+        """
+        Generates image tag for the data volume
+
+        :return: (str) Volume image tag
+        """
+        tag = "shippy_{app_name}:{sha}".format(app_name=self.config["app_name"], sha=self.sha)
+        return tag
+
     def get_name(self):
         """
         Returns name of the docker volume
 
-        :return:(str) Name of the docker volume tag
+        :return:(str) Name of the docker volume name
         """
         return self.volume_name
+
+    def get_tag(self):
+        """
+        Returns name of the docker image tag
+
+        :return:(str) Name of the docker volume tag
+        """
+        return self.volume_image_tag
 
     def _render_template(self):
         """
@@ -123,14 +147,17 @@ class DataVolume:
         LOGGER.info("Creating docker data volume")
 
         try:
-            response = self.cli.build(path=self.sourcecode_path, rm=True, tag=self.volume_name)
+            response = self.cli.build(path=self.sourcecode_path, rm=True, tag=self.volume_image_tag)
         except docker.errors.BuildError as e:
             LOGGER.error("Problem building docker image")
             LOGGER.error(e)
             raise SystemExit(1)
 
         for line in response:
-            LOGGER.info(line)
+            decoded = line.decode("utf-8")
+            if "error" in decoded:
+                LOGGER.error(decoded)
+                raise docker.errors.BuildError
 
     def remove(self):
         """
