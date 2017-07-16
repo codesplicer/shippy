@@ -1,0 +1,22 @@
+version: '2'
+services:
+  {{ application_name }}_source_data:
+    image: {{ data_volume_tag }}
+  db:
+    image: {{ db_image_tag }}
+    environment:
+    {% for key, value in database_config.items() -%}
+      - {{ key }}={{ value }}
+    {% endfor -%}
+    restart: always
+  {{ application_name }}_app:
+    image: {{ app_image_tag }} # ghost:0.11.1
+    environment:
+    {% for key, value in application_config.items() -%}
+      - {{ key }}={{ value }}
+    {% endfor -%}
+    network_mode: bridge
+    volumes_from:
+      - {{ application_name }}_source_data
+    restart: always
+    hostname: {{ application_name }}_{{ sha }}.dev.internal
