@@ -109,3 +109,19 @@ def get_repository_appname(repo_url):
     repo_path = _get_repo_path(repo_url)
     return repo_path[1]
 
+def create_directory(dir):
+    """
+    Creates the specified directory if it doesn't exist, including all
+    intermediate directories.
+
+    :param dir: (str) Directory path to create
+    :return:
+    """
+    try:
+        os.makedirs(dir)
+    except OSError as e:
+        # Ignore if it already exists
+        if e.errno != errno.EEXIST:
+            # We have some other disk error
+            raise
+
