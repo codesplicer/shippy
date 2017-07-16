@@ -26,21 +26,19 @@ import docker
 from copy import deepcopy
 
 LOGGER = logging.getLogger(__name__)
-DOCKERFILE_TEMPLATE = '''
+DOCKERFILE_TEMPLATE = """\
 FROM busybox
 
 # Create source directory
-RUN mkdir -p {{ target_sourcepath }}
-RUN chmod -R 777 {{ target_sourcepath }}
-
-ADD {{ source_archivedir }} {{ target_sourcepath }}
-
-VOLUME {{ target_sourcepath }}
-
-LABEL version={{ source_sha }}
+RUN groupadd -r user && useradd -r -g user user
+RUN mkdir -p {mountpoint} && chown -R user:user {mountpoint}
+RUN chmod -R 777 {mountpoint}
+ADD . {mountpoint}
+VOLUME {mountpoint}
+LABEL version={source_sha}
 LABEL maintainer="Vik Bhatti (github@vikbhatti.com)"
 
-'''
+"""
 
 
 class DataVolume:
