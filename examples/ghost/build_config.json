@@ -1,0 +1,24 @@
+{
+  "application_image": "thedigitalgarage/ghost",
+  "application_repository": "https://github.com/tryghost/ghost",
+  "application_source_mountpoint": "/usr/src/ghost",
+  "application_config": {
+    "GHOST_URL": "http://www.example.com",
+    "NODE_ENV": "production",
+    "GHOST_SOURCE": "/usr/src/ghost",
+    "DB_CLIENT": "mysql",
+    "DB_USER": "ghost_user",
+    "DB_PASSWORD": "ghostadmin1234",
+    "DB_HOST": "db"
+  },
+  "application_build_cmds": [
+    "npm install --production"
+  ],
+  "database_image": "mysql/mysql-server",
+  "database_config": {
+    "MYSQL_USER": "ghost_user",
+    "MYSQL_PASSWORD": "ghostadmin1234",
+    "MYSQL_DATABASE": "ghost",
+    "MYSQL_ROOT_PASSWORD": "admin1234"
+  }
+}
