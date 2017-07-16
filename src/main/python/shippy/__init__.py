@@ -19,7 +19,8 @@ __author__ = "Vik Bhatti"
 __version__ = "${version}"
 
 
-LOGGING_FORMAT = "%(asctime)-15s: %(name)s: %(levelname)-8s : %(filename)s:%(lineno)s - %(funcName)20s() : %(message)s"
+# LOGGING_FORMAT = "%(asctime)-15s: %(name)s: %(levelname)-8s : %(filename)s:%(lineno)s - %(funcName)20s() : %(message)s"
+LOGGING_FORMAT = "%(asctime)-15s: %(name)s: %(levelname)-8s : %(message)s"
 
 
 def initialise_root_logger(log_level=INFO):
