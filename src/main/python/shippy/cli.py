@@ -21,8 +21,12 @@ Command-line entrypoint
 """
 import logging
 import argh
+from shippy.repository_archive import RepositoryArchive
 from shippy.data_volume import DataVolume
 from shippy.config_loader import ConfigLoader
+from shippy.container_stack import ContainerStack
+from shippy import utils
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -52,3 +56,56 @@ def deploy_stack(**kwargs):
     workdir = "/tmp/shippy/archives/{app_name}_{sha}".format(app_name=config["app_name"], sha=sha)
     utils.create_directory(workdir)
 
+    # 2. Fetch application sourcecode archive
+    LOGGER.info("About to fetch repo archive...")
+    repo = RepositoryArchive(config["application_repository"])
+    download_path = repo.fetch(kwargs["sha"], download_path=workdir)
+    LOGGER.info("Downloaded archive to: %s", download_path)
+
+# 3. Unpack sourcecode archive
+    LOGGER.info("Downloaded archive to: %s", download_path)
+    LOGGER.info("Unpacking archive")
+    output_dir = utils.unpack_archive(download_path, config["app_name"], working_dir=workdir)
+    LOGGER.info("Unpacked archive into: %s", output_dir)
+
+    # 4. Run build commands
+    for cmd in config["application_build_cmds"]:
+        utils.execute_command(cmd, working_dir=output_dir)
+
+    # 5. Copy application config file into sourcecode path root
+    LOGGER.info("Copying application config file into: %s", output_dir)
+    utils.copy_file(kwargs["appconfig"], output_dir)
+
+    # 6. Build docker sourcecode data volume
+    volume = DataVolume(output_dir, sha, config)
+    volume.build()
+
+    # 7. Build and write docker-compose stack configuration
+    stack = ContainerStack(config, sha, output_dir, volume.get_tag())
+    stack.write_compose_file()
+
+    # 8. Start docker-compose stack
+    LOGGER.info("Starting container stack")
+    stack.start()
+    LOGGER.info("Stack is ready, have a nice day!")
+
+
+@argh.arg("--sha", help="Commit hash to search for. If unspecified will return all running stacks", default="b37411239f70f538e198e238610a0e7e9c6b83b0")
+def list_stacks(**kwargs):
+    """
+    Lists all running docker-compose stacks
+
+    :param kwargs:
+    :return:
+    """
+    # 1. get list of all running containers with the shippy prefix
+
+    # 2. Build a prettytable chart
+
+    # 3. Display table
+
+
+@argh.arg("--sha", help="Commit hash to terminate stack for", default=None)
+def terminate_stack(**kwargs):
+    if not kwargs["sha"]:
+        LOGGER.error("You must specify a stack to terminate with the --sha flag")
