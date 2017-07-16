@@ -5,7 +5,7 @@ A tool to build and provision a docker-compose stack for a webapp given an appli
 
   - [Project dependencies](#project-dependencies)
   - [Setup](#setup)
-    - [Python3](#python3)
+    - [Python3](#python-3)
     - [Docker](#docker)
     - [Pybuilder](#pybuilder)
   - [Installation](#installation)
