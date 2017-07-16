@@ -40,9 +40,6 @@ def get_template_filepath(filename, basepath="templates"):
     :raises: (SystemExit) If template file doesn't exist
     """
     local_path = os.path.dirname(__file__)
-    print("===================")
-    print(local_path)
-    print("===================")
     path = os.path.dirname(os.path.abspath(os.path.join(local_path, basepath, filename)))
 
     if os.path.isdir(path):

@@ -70,7 +70,7 @@ class DataVolume:
 
         :return: (str) Volume name
         """
-        volume_name = "{app_name}_data_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
+        volume_name = "shippy_{app_name}_data_{sha}".format(app_name=self.config["app_name"], sha=self.sha)
         return volume_name
 
     def _generate_tag(self):
@@ -147,7 +147,7 @@ class DataVolume:
         LOGGER.info("Creating docker data volume")
 
         try:
-            response = self.cli.build(path=self.sourcecode_path, rm=True, tag=self.volume_image_tag)
+            response = self.cli.build(path=self.sourcecode_path, rm=True, tag=self.volume_name)
         except docker.errors.BuildError as e:
             LOGGER.error("Problem building docker image")
             LOGGER.error(e)

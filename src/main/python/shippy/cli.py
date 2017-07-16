@@ -62,7 +62,7 @@ def deploy_stack(**kwargs):
     download_path = repo.fetch(kwargs["sha"], download_path=workdir)
     LOGGER.info("Downloaded archive to: %s", download_path)
 
-# 3. Unpack sourcecode archive
+    # 3. Unpack sourcecode archive
     LOGGER.info("Downloaded archive to: %s", download_path)
     LOGGER.info("Unpacking archive")
     output_dir = utils.unpack_archive(download_path, config["app_name"], working_dir=workdir)
@@ -81,7 +81,7 @@ def deploy_stack(**kwargs):
     volume.build()
 
     # 7. Build and write docker-compose stack configuration
-    stack = ContainerStack(config, sha, output_dir, volume.get_tag())
+    stack = ContainerStack(config, sha, output_dir, volume.get_name())
     stack.write_compose_file()
 
     # 8. Start docker-compose stack
