@@ -22,7 +22,7 @@ Builds and manages a docker data volume with the provided sourcecode
 """
 import logging
 from io import BytesIO
-from docker import AutoVersionClient
+import docker
 from copy import deepcopy
 
 LOGGER = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class DataVolume:
         self.sourcecode_path = sourcecode_path
         self.sha = sha
         self.config = deepcopy(config)
-        self.cli = AutoVersionClient(base_url='unix://var/run/docker.sock')
+        self.cli = APIClient(base_url='unix://var/run/docker.sock')
         self.volume_name = self._generate_name()
 
     def _generate_name(self):
