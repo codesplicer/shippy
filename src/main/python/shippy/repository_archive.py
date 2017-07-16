@@ -24,7 +24,7 @@ import requests
 import logging
 
 from tqdm import tqdm
-from utils import get_repository_username, get_repository_appname
+from shippy.utils import get_repository_username, get_repository_appname
 
 
 GITHUB_API_BASEURL = "https://api.github.com"
