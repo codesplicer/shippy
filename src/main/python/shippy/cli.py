@@ -19,4 +19,26 @@ shippy.cli
 
 Command-line entrypoint
 """
-i
+import logging
+import argh
+from shippy.data_volume import DataVolume
+LOGGER = logging.getLogger(__name__)
+
+
+@argh.arg("configpath", type=str, help="Path to build config")
+@argh.arg("appconfig", help="Path to application config")
+@argh.arg("sha", type=str, help="Commit hash to build source from")
+def deploy_stack(**kwargs):
+    """
+    Deploys an application stack
+    """
+    if not kwargs["sha"]:
+        # raise KeyError("Missing --sha")
+        LOGGER.error("You must specify a SHA with the --sha flag")
+    sha = kwargs["sha"]
+
+    if not kwargs["configpath"]:
+        # raise KeyError("Missing --configpath")
+        LOGGER.error("Missing --configpath")
+    configpath = kwargs["configpath"]
+
