@@ -69,3 +69,43 @@ def load_template(name):
 
     return template
 
+
+def _get_repo_path(repo_url):
+    """
+    Extracts the username/reponame from the given github URL
+
+    :param repo_url: (str) Full https path to the github repository
+    :return: (str) <username>/<reponame>
+    """
+    position = repo_url.find("github.com")
+    name = ""
+    if position >= 0:
+        name = repo_url[position + 11:]
+        if name.endswith("/"):
+            # Strip trailing slash
+            name = name[:-1]
+    else:
+        if repo_url.endswith("/"):
+            name = repo_url[:-1]
+    return name.split("/")
+
+
+def get_repository_username(repo_url):
+    """
+    Returns the repository username
+
+    :return: (str) Repository owner username
+    """
+    repo_path = _get_repo_path(repo_url)
+    return repo_path[0]
+
+
+def get_repository_appname(repo_url):
+    """
+    Returns the repository name
+
+    :return: (str) Repository name
+    """
+    repo_path = _get_repo_path(repo_url)
+    return repo_path[1]
+
