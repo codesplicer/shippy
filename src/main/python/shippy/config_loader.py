@@ -112,10 +112,6 @@ class ConfigLoader:
                     "type": "string",
                     "required": True
                 },
-                "application_config_filepath": {
-                    "type": "string",
-                    "required": True
-                },
                 "application_config": {
                     "type": "object",
                     "required": True,
