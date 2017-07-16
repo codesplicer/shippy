@@ -53,6 +53,13 @@ by running:
 
 `pip install pybuilder`
 
+## Virtualenv
+
+Optionally you can also create an isolated virutalenv to ensure that required library versions
+don't clash with your global python installation. To create a python3 virtualenv:
+
+```virtualenv -p /usr/local/bin/python3 shippy```
+
 
 # Installation
 
